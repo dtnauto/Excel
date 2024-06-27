@@ -86,13 +86,13 @@ fun copyRowStyles(sourceRow: Row, targetRow: Row) {
     }
 }
 
-
 fun cutAndFormatString(
     cellValue: String?,
     startKeyword: String = "",
     endKeyword: String = "",
     offsetLen: Int = 0,
-    format: Int = 0
+    format: Int = 0,
+    takeChars: Int = 0
 ): String? {
     if (cellValue.isNullOrEmpty()) {
         return null
@@ -106,41 +106,51 @@ fun cutAndFormatString(
     // Nếu startKeyword được truyền vào
     startPos = if (startKeyword.isNotEmpty()) {
         val offset = if (offsetLen == -1) startKeyword.length else offsetLen
-        cellValue.indexOf(startKeyword, ignoreCase = true) + offset
+        val startIndex = cellValue.indexOf(startKeyword, ignoreCase = true)
+        if (startIndex != -1) startIndex + offset else 0
     } else {
         // Nếu không có startKeyword, bắt đầu từ đầu chuỗi
         0
     }
 
-    if (startPos > 0) {
-        // Nếu có endKeyword
-        endPos = if (endKeyword.isNotEmpty()) {
-            cellValue.indexOf(endKeyword, startPos, ignoreCase = true)
-        } else {
-            // Nếu không có endKeyword, cắt đến cuối chuỗi
-            cellValue.length
-        }
-
-        // Nếu endKeyword được tìm thấy
-        cutString = if (endPos > startPos) {
-            cellValue.substring(startPos, endPos)
-        } else if (endPos == 0) {
-            ""
-        } else {
-            // Nếu không tìm thấy endKeyword, trả về phần của chuỗi từ startPos đến cuối chuỗi
-            cellValue.substring(startPos)
-        }
+    // Nếu có endKeyword
+    endPos = if (endKeyword.isNotEmpty()) {
+        val endIndex = cellValue.indexOf(endKeyword, startPos, ignoreCase = true)
+        if (endIndex != -1) endIndex else cellValue.length
     } else {
-        // Nếu không tìm thấy startKeyword, trả về chuỗi rỗng
-        cutString = ""
+        // Nếu không có endKeyword, cắt đến cuối chuỗi
+        cellValue.length
     }
 
-    formattedString = if (format == 1) {
-        // Chuyển chuỗi thành chữ thường
-        cutString.lowercase().replace("_", " ").replaceFirstChar { it.uppercase() }.trim()
+    // Nếu endKeyword được tìm thấy
+    cutString = if (endPos > startPos) {
+        cellValue.substring(startPos, endPos)
     } else {
-        // Nếu không cần định dạng, trả về chuỗi cắt
-        cutString
+        // Nếu không tìm thấy endKeyword, trả về phần của chuỗi từ startPos đến cuối chuỗi
+        cellValue.substring(startPos)
+    }
+
+    // Lấy x ký tự từ chuỗi được cắt ra nếu takeChars > 0
+    if (takeChars > 0 && cutString.length > takeChars) {
+        cutString = cutString.substring(0, takeChars)
+    }
+
+    formattedString = when (format) {
+        1 -> {
+            // Chuyển chuỗi thành chữ thường và viết hoa chữ cái đầu tiên
+            cutString.lowercase().replace("_", " ").replaceFirstChar { it.uppercase() }.trim()
+        }
+        2 -> {
+            // Chuyển chuỗi thành chữ thường, bỏ dấu _ và viết hoa chữ cái đầu tiên sau mỗi dấu _
+            cutString.lowercase()
+                .split("_")
+                .joinToString("") { it.replaceFirstChar { char -> char.uppercase() } }
+                .trim()
+        }
+        else -> {
+            // Nếu không cần định dạng, trả về chuỗi cắt
+            cutString
+        }
     }
 
     // Trả về kết quả

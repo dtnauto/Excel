@@ -93,10 +93,10 @@ fun columnNameToInt(columnName: String): Int {
     // Duyệt ngược lại chuỗi columnName từ phải sang trái
     for (i in columnName.length - 1 downTo 0) {
         val char = columnName[i].toUpperCase() // Chuyển đổi ký tự thành chữ hoa để dễ xử lý
-        val value = char.toInt() - 'A'.toInt() // Chuyển đổi ký tự thành giá trị từ 0 (cho A) đến 25 (cho Z)
+        val value = char.toInt() - 'A'.toInt() + 1 // Chuyển đổi ký tự thành giá trị từ 1 (cho A) đến 26 (cho Z)
         result += value * power // Cộng dồn giá trị
         power *= 26 // Tăng mũ để tính cột tiếp theo
     }
 
-    return result
+    return result - 1
 }

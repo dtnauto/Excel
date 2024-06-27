@@ -1,7 +1,42 @@
 package com.example.excel.usecase52
 
 import com.example.excel.excelfile.columnNameToInt
+import com.example.excel.excelfile.openExcelFile
+import com.example.excel.excelfile.saveExcelFile
+import com.example.excel.screenhmi52.processColumnScreenSpec
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+
+fun main() {
+    val filePath = "C:\\Users\\daotr\\Desktop\\New Microsoft Excel Worksheet.xlsx"
+//    updateExcelFileWithSumFormula(filePath)
+//    applyConditionalFormula(filePath)
+    val workbook = openExcelFile(filePath)
+    if (workbook != null) {
+//        applyConditionalFormula(workbook, arrayOf("Sheet1"), arrayOf(0,1))
+//        deleteRowsContainingSubstring(workbook, "Sheet4", 1, "mediumItem")
+
+        /////////
+        /*val sheetName = "Sheet4"
+        val ranges = arrayOf(0, 1, 2) // Chỉ mục của các cột (zero-based index)
+        val insertItems = arrayOf("OFF", "WEAK", "MEDIUM", "STRONG") // Mảng giá trị cần chèn
+        val insertValues = arrayOf(
+            "Display [mediumItem] setting item",
+            "Update the display of [mediumItem] setting item",
+            "Change setting of [mediumItem] by user operation"
+        ) // Mảng giá trị thay thế
+
+        // Gọi hàm để chèn các dòng mới
+        newRowIf(workbook, sheetName, ranges, insertItems, insertValues)*/
+
+        /*processColumnSheet4(workbook, "Sheet5", 5)
+        processColumnSheet4(workbook, "Sheet5", 6)
+        processColumnSheet4(workbook, "Sheet5", 7)*/
+
+//        processColumnScreenSpec(workbook, "Sheet6", 0)
+
+        saveExcelFile(workbook, filePath)
+    }
+}
 
 fun processColumnSheet4(workbook: XSSFWorkbook, sheetName: String, columnToProcess: Int) {
     val sheet = workbook.getSheet(sheetName)
