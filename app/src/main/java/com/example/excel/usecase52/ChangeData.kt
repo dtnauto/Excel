@@ -3,6 +3,10 @@ package com.example.excel.usecase52
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
+fun main() {
+
+}
+
 fun deleteRowsContainingSubstring(workbook: XSSFWorkbook, sheetName: String, column: Int, searchString: String) {
     val sheet = workbook.getSheet(sheetName)
     var lastRow = sheet.lastRowNum
@@ -19,59 +23,6 @@ fun deleteRowsContainingSubstring(workbook: XSSFWorkbook, sheetName: String, col
             }
             lastRow-- // Giảm giá trị của lastRow vì một hàng đã bị xóa
         }
-    }
-}
-
-
-fun newRowIf(workbook: XSSFWorkbook, sheetName: String, ranges: Array<Int>, insertItems: Array<String>, insertValues: Array<String>) {
-    val sheet = workbook.getSheet(sheetName)
-    var lastRow = sheet.lastRowNum
-
-//    val newRow = 1
-//
-//    // Dịch chuyển các hàng bên dưới xuống
-//    if (newRow <= sheet.lastRowNum) {
-//        sheet.shiftRows(newRow, sheet.lastRowNum, 1)
-//    }
-//
-//    // Chèn hàng mới
-//    val row = sheet.createRow(newRow)
-//
-//    // Sao chép định dạng từ hàng phía trên (nếu có)
-//    val sourceRow = sheet.getRow(newRow - 1)
-//    if (sourceRow != null) {
-//        copyRowStyles(sourceRow, row)
-//    }
-
-    var currentRow = sheet.firstRowNum
-    while (currentRow <= lastRow) {
-        val cellValue = sheet.getRow(currentRow)?.getCell(ranges[0])?.toString() ?: ""
-
-        // Kiểm tra điều kiện để chèn dòng mới
-        if (cellValue.contains("ahihi") ) {//&& cellValue.contains("] screen")) {
-            var newRow = currentRow + 1
-
-            // Chèn dòng mới với các giá trị từ mảng insertItems và insertValues
-            for (item in insertItems) {
-                for (value in insertValues) {
-                    if (item.isNotBlank()) {
-                        sheet.shiftRows(newRow, lastRow+1, 1)
-                        val row = sheet.createRow(newRow)
-
-                        // Thay thế giá trị chèn
-                        val newCellValue = value.replace("[mediumItem]", "[$item]")
-                        row.createCell(ranges[1]).setCellValue(newCellValue)
-                        newRow++
-                        lastRow++
-                    }
-                }
-            }
-
-            // Cập nhật lại currentRow để bỏ qua các dòng vừa chèn
-            currentRow = newRow - 1
-        }
-
-        currentRow++
     }
 }
 
