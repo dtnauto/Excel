@@ -10,8 +10,7 @@ fun main() {
     val filePath = "C:\\Users\\daotr\\Desktop\\New Microsoft Excel Worksheet.xlsx"
     val workbook = openExcelFile(filePath)
     if (workbook != null) {
-//        addRow(workbook)
-        addRow2(workbook)
+        addRow(workbook)
         saveExcelFile(workbook, filePath)
     }
 }
@@ -298,182 +297,6 @@ fun addRow(workbook: XSSFWorkbook) {
     var lastRow = sheet.lastRowNum
     var currentRow = 2 // fix current row
 
-    while (currentRow <= lastRow) { // kiểm tra điều kiện để điền vào ô
-        val cellValue = sheet.getRow(currentRow)?.getCell(columnNameToInt("d"))?.toString() ?: ""
-
-        // Kiểm tra điều kiện để chèn dòng mới
-        if (cellValue.contains("ahihi")) {
-
-            for (rowItem in 2..14) {
-                // fix gia tri dien vao
-                for (rowUseCase in 2..4) {
-                    val newCellValue = sheetContainItem.getRow(rowUseCase)
-                        .getCell(columnNameToInt("h")).stringCellValue
-                        .replace(
-                            "[]",
-                            "<${
-                                sheetContainItem.getRow(rowItem)
-                                    .getCell(columnNameToInt("d")).stringCellValue
-                            }>" +
-                                    " [${
-                                        sheetContainItem.getRow(rowItem)
-                                            .getCell(columnNameToInt("e")).stringCellValue
-                                    }]"
-                        )
-                    sheet.shiftRows(++currentRow, ++lastRow, 1)
-                    sheet.createRow(currentRow).createCell(columnNameToInt("d"))
-                        .setCellValue(newCellValue)
-                }
-            }
-
-            for (rowItem in 2..14) {
-                // fix gia tri dien vao
-                for (rowUseCase in 5..7) {
-                    val newCellValue = sheetContainItem.getRow(rowUseCase)
-                        .getCell(columnNameToInt("h")).stringCellValue
-                        .replace(
-                            "[]",
-                            "<${
-                                sheetContainItem.getRow(rowItem)
-                                    .getCell(columnNameToInt("d")).stringCellValue
-                            }>" +
-                                    " [${
-                                        sheetContainItem.getRow(rowItem)
-                                            .getCell(columnNameToInt("e")).stringCellValue
-                                    }]"
-                        )
-                    sheet.shiftRows(++currentRow, ++lastRow, 1)
-                    sheet.createRow(currentRow).createCell(columnNameToInt("d"))
-                        .setCellValue(newCellValue)
-                }
-            }
-
-            for (rowItem in 2..14) {
-                val cellAction =
-                    sheetContainItem.getRow(rowItem).getCell(columnNameToInt("f")).stringCellValue
-                if (cellAction != null && cellAction.length > 7) {
-                    if (cellAction[6] == '0') {
-                        // fix gia tri dien vao
-                        for (rowUseCase in 8..8) {
-                            val newCellValue = sheetContainItem.getRow(rowUseCase)
-                                .getCell(columnNameToInt("h")).stringCellValue
-                                .replace(
-                                    "[]",
-                                    "<${
-                                        sheetContainItem.getRow(rowItem)
-                                            .getCell(columnNameToInt("d")).stringCellValue
-                                    }>" +
-                                            " [${
-                                                sheetContainItem.getRow(rowItem)
-                                                    .getCell(columnNameToInt("e")).stringCellValue
-                                            }" +
-                                            " ($cellAction)]"
-                                )
-
-                            sheet.shiftRows(++currentRow, ++lastRow, 1)
-                            sheet.createRow(currentRow).createCell(columnNameToInt("d"))
-                                .setCellValue(newCellValue)
-                        }
-                    }
-                }
-            }
-
-            for (rowItem in 2..14) {
-                val cellAction =
-                    sheetContainItem.getRow(rowItem).getCell(columnNameToInt("f")).stringCellValue
-                if (cellAction.isNullOrEmpty()) {
-                    // fix gia tri dien vao
-                    for (rowUseCase in 9..10) {
-                        val newCellValue = sheetContainItem.getRow(rowUseCase)
-                            .getCell(columnNameToInt("h")).stringCellValue
-                            .replace(
-                                "[]",
-                                "<${
-                                    sheetContainItem.getRow(rowItem)
-                                        .getCell(columnNameToInt("d")).stringCellValue
-                                }>" +
-                                        " [${
-                                            sheetContainItem.getRow(rowItem)
-                                                .getCell(columnNameToInt("e")).stringCellValue
-                                        }]"
-                            )
-
-                        sheet.shiftRows(++currentRow, ++lastRow, 1)
-                        sheet.createRow(currentRow).createCell(columnNameToInt("d"))
-                            .setCellValue(newCellValue)
-                    }
-                }
-            }
-
-            for (rowItem in 2..14) {
-                val cellAction =
-                    sheetContainItem.getRow(rowItem).getCell(columnNameToInt("f")).stringCellValue
-                if (cellAction != null && cellAction.length > 7) {
-                    if (cellAction[6] == 'A') {
-                        // fix gia tri dien vao
-                        for (rowUseCase in 11..17) {
-                            val newCellValue = sheetContainItem.getRow(rowUseCase)
-                                .getCell(columnNameToInt("h")).stringCellValue
-                                .replace(
-                                    "[]",
-                                    "<${
-                                        sheetContainItem.getRow(rowItem)
-                                            .getCell(columnNameToInt("d")).stringCellValue
-                                    }>" +
-                                            " [${
-                                                sheetContainItem.getRow(rowItem)
-                                                    .getCell(columnNameToInt("e")).stringCellValue
-                                            }" +
-                                            " (${
-                                                cellAction.replace(
-                                                    "${cellAction[7]}${cellAction[8]}",
-                                                    ("${cellAction[7]}${cellAction[8]}".toInt() + sheetContainItem.getRow(
-                                                        rowUseCase
-                                                    )
-                                                        .getCell(columnNameToInt("i")).numericCellValue.toInt()).toString()
-                                                        .padStart(2, '0')
-                                                )
-                                            })]"
-                                )
-
-                            sheet.shiftRows(++currentRow, ++lastRow, 1)
-                            sheet.createRow(currentRow).createCell(columnNameToInt("d"))
-                                .setCellValue(newCellValue)
-                        }
-                    }
-                }
-            }
-
-            for (rowItem in 2..14) {
-                if (rowItem == 14) {
-                    // fix gia tri dien vao
-                    for (rowUseCase in 18..18) {
-                        val newCellValue = sheetContainItem.getRow(rowUseCase)
-                            .getCell(columnNameToInt("h")).stringCellValue
-                            .replace(
-                                "[]",
-                                "[mediumItem]"
-                            )
-                        sheet.shiftRows(++currentRow, ++lastRow, 1)
-                        sheet.createRow(currentRow).createCell(columnNameToInt("d"))
-                            .setCellValue(newCellValue)
-                    }
-                }
-            }
-        }
-        currentRow++
-    }
-}
-
-fun addRow2(workbook: XSSFWorkbook) {
-    val workbookContainItem =
-        openExcelFile("C:\\Users\\daotr\\Desktop\\New Microsoft Excel Worksheet.xlsx")!!
-    val sheetContainItem = workbookContainItem.getSheet("Sheet2")
-    val sheet = workbook.getSheet("Sheet4")
-
-    var lastRow = sheet.lastRowNum
-    var currentRow = 2 // fix current row
-
     fun shiftAndCreateRow(newCellValue: String) {
         sheet.shiftRows(++currentRow, ++lastRow, 1)
         sheet.createRow(currentRow).createCell(columnNameToInt("d")).setCellValue(newCellValue)
@@ -526,126 +349,70 @@ fun addRow2(workbook: XSSFWorkbook) {
     while (currentRow <= lastRow) {
         val cellValue = sheet.getRow(currentRow)?.getCell(columnNameToInt("d"))?.toString() ?: ""
         if (cellValue.contains("ahihi")) {
+            val rangesOfItem = arrayOf(2..14,15..23,24..27)
+            val rangesOfUseCase = arrayOf(2..4,5..7,8..8,9..10,11..17,18..18)
 
-            processRows(2..14, 2..4,
-                ifAction = { _ ->
-                    true
-                })
-            processRows(2..14, 5..7,
-                ifAction = { _ ->
-                    true
-                })
+            for (rangeOfItem in rangesOfItem){
+                processRows(rangeOfItem, rangesOfUseCase[0],
+                    ifAction = { _ ->
+                        true
+                    })
+                processRows(rangeOfItem, rangesOfUseCase[1],
+                    ifAction = { _ ->
+                        true
+                    })
 
-            processRows(2..14, 8..8,
-                ifAction = { rowItem ->
-                    val cellAction = sheetContainItem.getRow(rowItem)
-                        .getCell(columnNameToInt("f")).stringCellValue
-                    (cellAction.length > 7 && cellAction[6] == '0')
-                },
-                extraText = { rowItem, _ ->
-                    val cellAction = sheetContainItem.getRow(rowItem)
-                        .getCell(columnNameToInt("f")).stringCellValue
-
-                    " ($cellAction)"
-                })
-
-            processRows(2..14, 9..10,
-                ifAction = { rowItem ->
-                    val cellAction = sheetContainItem.getRow(rowItem)
-                        .getCell(columnNameToInt("f")).stringCellValue
-                    (cellAction.isEmpty())
-                })
-
-            processRows(2..14, 11..17,
-                ifAction = { rowItem ->
-                    val cellAction =
-                        sheetContainItem.getRow(rowItem)
+                processRows(rangeOfItem, rangesOfUseCase[2],
+                    ifAction = { rowItem ->
+                        val cellAction = sheetContainItem.getRow(rowItem)
                             .getCell(columnNameToInt("f")).stringCellValue
-                    (cellAction.length > 7 && cellAction[6] == 'A')
-                },
-                extraText = { rowItem, rowUseCase ->
-                    val cellAction = sheetContainItem.getRow(rowItem)
-                        .getCell(columnNameToInt("f")).stringCellValue
+                        (cellAction.length > 7 && cellAction[6] == '0')
+                    },
+                    extraText = { rowItem, _ ->
+                        val cellAction = sheetContainItem.getRow(rowItem)
+                            .getCell(columnNameToInt("f")).stringCellValue
 
-                    val adjustedAction = cellAction.replace(
-                        "${cellAction[7]}${cellAction[8]}",
-                        ("${cellAction[7]}${cellAction[8]}".toInt() +
-                                sheetContainItem.getRow(rowUseCase)
-                                    .getCell(columnNameToInt("i")).numericCellValue.toInt()
-                                ).toString().padStart(2, '0')
-                    )
+                        " ($cellAction)"
+                    })
 
-                    " ($adjustedAction)"
-                })
+                processRows(rangeOfItem, rangesOfUseCase[3],
+                    ifAction = { rowItem ->
+                        val cellAction = sheetContainItem.getRow(rowItem)
+                            .getCell(columnNameToInt("f")).stringCellValue
+                        (cellAction.isEmpty())
+                    })
 
-            processRows(2..14, 18..18,
-                ifAction = { rowItem ->
-                    rowItem == 14
-                },
-                { _, _ ->
-                    "[mediumItem]"
-                })
-        }
-        currentRow++
-    }
-}
+                processRows(rangeOfItem, rangesOfUseCase[4],
+                    ifAction = { rowItem ->
+                        val cellAction =
+                            sheetContainItem.getRow(rowItem)
+                                .getCell(columnNameToInt("f")).stringCellValue
+                        (cellAction.length > 7 && cellAction[6] == 'A')
+                    },
+                    extraText = { rowItem, rowUseCase ->
+                        val cellAction = sheetContainItem.getRow(rowItem)
+                            .getCell(columnNameToInt("f")).stringCellValue
 
+                        val adjustedAction = cellAction.replace(
+                            "${cellAction[7]}${cellAction[8]}",
+                            ("${cellAction[7]}${cellAction[8]}".toInt() +
+                                    sheetContainItem.getRow(rowUseCase)
+                                        .getCell(columnNameToInt("i")).numericCellValue.toInt()
+                                    ).toString().padStart(2, '0')
+                        )
 
-fun newRowIf(
-    workbook: XSSFWorkbook,
-    sheetName: String,
-    ranges: Array<Int>,
-    insertItems: Array<String>,
-    insertValues: Array<String>
-) {
-    val sheet = workbook.getSheet(sheetName)
-    var lastRow = sheet.lastRowNum
+                        " ($adjustedAction)"
+                    })
 
-//    val newRow = 1
-//
-//    // Dịch chuyển các hàng bên dưới xuống
-//    if (newRow <= sheet.lastRowNum) {
-//        sheet.shiftRows(newRow, sheet.lastRowNum, 1)
-//    }
-//
-//    // Chèn hàng mới
-//    val row = sheet.createRow(newRow)
-//
-//    // Sao chép định dạng từ hàng phía trên (nếu có)
-//    val sourceRow = sheet.getRow(newRow - 1)
-//    if (sourceRow != null) {
-//        copyRowStyles(sourceRow, row)
-//    }
-
-    var currentRow = sheet.firstRowNum
-    while (currentRow <= lastRow) {
-        val cellValue = sheet.getRow(currentRow)?.getCell(ranges[0])?.toString() ?: ""
-
-        // Kiểm tra điều kiện để chèn dòng mới
-        if (cellValue.contains("ahihi")) {//&& cellValue.contains("] screen")) {
-            var newRow = currentRow + 1
-
-            // Chèn dòng mới với các giá trị từ mảng insertItems và insertValues
-            for (item in insertItems) {
-                for (value in insertValues) {
-                    if (item.isNotBlank()) {
-                        sheet.shiftRows(newRow, lastRow + 1, 1)
-                        val row = sheet.createRow(newRow)
-
-                        // Thay thế giá trị chèn
-                        val newCellValue = value.replace("[mediumItem]", "[$item]")
-                        row.createCell(ranges[1]).setCellValue(newCellValue)
-                        newRow++
-                        lastRow++
-                    }
-                }
+                processRows(rangeOfItem, rangesOfUseCase[5],
+                    ifAction = { rowItem ->
+                        rowItem == 14
+                    },
+                    { _, _ ->
+                        "[mediumItem]"
+                    })
             }
-
-            // Cập nhật lại currentRow để bỏ qua các dòng vừa chèn
-            currentRow = newRow - 1
         }
-
         currentRow++
     }
 }
-
