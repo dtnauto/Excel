@@ -10,7 +10,7 @@ fun applyConditionalFormula(workbook: XSSFWorkbook, sheetName: Array<String>, ra
     // Giả sử rằng người dùng đã chọn cột A và B trong VBA, chúng ta sẽ sử dụng cột A và B.
 
     val lastRow = sheet.lastRowNum
-    var currentRow = 1
+    var currentRow = 361 //fix lại chỉ số đầu
 
     while (currentRow <= lastRow) {
         val sourceCell = sheet.getRow(currentRow)?.getCell(ranges[0])
@@ -31,7 +31,7 @@ fun applyConditionalFormula(workbook: XSSFWorkbook, sheetName: Array<String>, ra
                 val currentTargetCell = sheet.getRow(currentRow).getCell(ranges[1]) ?: sheet.getRow(currentRow).createCell(ranges[1])
                 val previousTargetCell = sheet.getRow(currentRow - 1)?.getCell(ranges[1]) ?: sheet.getRow(currentRow).createCell(ranges[1])
 
-                currentTargetCell.setCellValue(previousTargetCell.numericCellValue + 1)
+//                currentTargetCell.setCellValue(previousTargetCell.numericCellValue + 1)
 
                 // Tạo đối tượng font
                 val font = workbook.createFont().apply {
@@ -50,7 +50,7 @@ fun applyConditionalFormula(workbook: XSSFWorkbook, sheetName: Array<String>, ra
             val currentTargetCell = sheet.getRow(currentRow).getCell(ranges[1]) ?: sheet.getRow(currentRow).createCell(ranges[1])
             val previousTargetCell = sheet.getRow(currentRow - 1)?.getCell(ranges[1]) ?: sheet.getRow(currentRow).createCell(ranges[1])
 
-            currentTargetCell.setCellValue(previousTargetCell.numericCellValue)
+//            currentTargetCell.setCellValue(previousTargetCell.numericCellValue)
 
             // Tạo đối tượng font
             val font = workbook.createFont().apply {
