@@ -7,14 +7,77 @@ import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.DataInput
 
+const val file_Path =
+    "C:\\Users\\daotr\\Desktop\\New Microsoft Excel Worksheet.xlsx"
+//    "D:\\working\\safety setting\\eng5.2\\New template.xlsx"
+
+const val file_ContainUseCase =
+    "C:\\Users\\daotr\\Desktop\\HMI_Screen_NHANDT53 - Copy.xlsx"
+////        "D:\\working\\safety setting\\Input\\Spec\\HMI_Screen_NHANDT53 - Copy.xlsx"
+
+const val file_ContainItem =
+    "C:\\Users\\daotr\\Desktop\\HMI_Screen_NHANDT53 - Copy.xlsx"
+//        "D:\\working\\safety setting\\Input\\Spec\\HMI_Screen_NHANDT53 - Copy.xlsx"
 
 fun main() {
-    val filePath =
-        "C:\\Users\\daotr\\Desktop\\New Microsoft Excel Worksheet.xlsx"
-//        "D:\\working\\safety setting\\eng5.2\\New template.xlsx"
+    val filePath = file_Path
 
     val workbook = openExcelFile(filePath)
     if (workbook != null) {
+
+
+        // Gọi hàm để chèn các dòng mới
+//        addRowver2(workbook, "Sheet4")
+        // Gọi hàm để xóa các dòng
+//        deleteRowsContainingSubstring(workbook, "Sheet4", 1, "bigItem")
+
+        // Gọi hàm để chèn các dòng mới
+        copyRowver2(workbook, "Sheet1")
+
+        // replaceUseCase
+        for (row in 5..workbook.getSheet("Sheet1").lastRowNum) {
+            val currentRow = workbook.getSheet("Sheet1").getRow(row)
+            val inputCell = currentRow?.getCell(columnNameToInt("k"))?.stringCellValue
+            if (inputCell != null) {
+                replaceUseCase(inputCell, columnNameToInt("e"))?.apply {
+                    currentRow.createCell(columnNameToInt("e"))?.setCellValue(this)
+                }
+
+                currentRow.createCell(columnNameToInt("f"))?.cellFormula =
+                    "IF(E${row + 1}<>E${row},1,IF(G${row + 1}<>G${row},F${row}+1,F${row}))"
+
+                replaceUseCase(inputCell, columnNameToInt("g"))?.apply {
+                    currentRow.createCell(columnNameToInt("g"))?.setCellValue(this)
+                }
+
+                replaceUseCase(inputCell, columnNameToInt("h"))?.apply {
+                    currentRow.createCell(columnNameToInt("h"))?.setCellValue(this)
+                }
+
+                replaceUseCase(inputCell, columnNameToInt("i"))?.apply {
+                    currentRow.createCell(columnNameToInt("i"))?.setCellValue(this)
+                }
+
+                currentRow.createCell(columnNameToInt("j"))?.cellFormula =
+                    "IF(F${row + 1}<>F${row},1,J${row}+1)"
+
+                currentRow.createCell(columnNameToInt("l"))?.cellFormula =
+                    "\"UC.\"&D${row + 1}&\"-\"&F${row + 1}&\"-\"&J${row + 1}"
+
+                replaceUseCase(inputCell, columnNameToInt("m"))?.apply {
+                    currentRow.createCell(columnNameToInt("m"))?.setCellValue(this)
+                }
+
+                replaceUseCase(inputCell, columnNameToInt("n"))?.apply {
+                    currentRow.createCell(columnNameToInt("n"))?.setCellValue(this)
+                }
+
+                // chu y fix UseCase de cuoi cung do
+                replaceUseCase(inputCell, columnNameToInt("k"))?.apply {
+                    currentRow.createCell(columnNameToInt("k"))?.setCellValue(this)
+                }
+            }
+        }
 
         // thay doi mau chu
         /*applyConditionalFormula(workbook, arrayOf("Sheet1"), arrayOf(columnNameToInt("d"),
@@ -30,47 +93,14 @@ fun main() {
             columnNameToInt("g")
         ))*/
 
-        // Gọi hàm để xóa các dòng
-//        deleteRowsContainingSubstring(workbook, "Sheet4", 1, "bigItem")
-
-        // Gọi hàm để chèn các dòng mới
-//        addRowver2(workbook, "Sheet4")
-
-        // Gọi hàm để chèn các dòng mới
-        copyRowver2(workbook, "Sheet1")
-
-//         xu ly overView
-        for (i in 3..workbook.getSheet("Sheet1").lastRowNum) {
-            val currentRow = workbook.getSheet("Sheet1").getRow(i)
-            val inputCell = currentRow?.getCell(columnNameToInt("k"))?.stringCellValue
-            if (inputCell != null) {
-                overViewver2(inputCell)?.apply {
-                    currentRow.createCell(columnNameToInt("n"))?.setCellValue(this)
-                }
-            }
-        }
-
-        // xu ly overView
-//        for (i in 500..workbook.getSheet("Sheet1").lastRowNum) {
-//            val currentRow = workbook.getSheet("Sheet1").getRow(i)
-//            val inputCell = currentRow?.getCell(columnNameToInt("k"))?.stringCellValue
-//            if (inputCell != null) {
-//                overView(inputCell)?.apply {
-//                    currentRow.createCell(columnNameToInt("n"))?.setCellValue(this)
-//                }
-//            }
-//        }
-
         // ket thuc file
         saveExcelFile(workbook, filePath)
     }
 }
 
-fun overViewver2(inputCell: String?): String? {
+fun replaceUseCase(inputCell: String?, columnRef: Int): String? {
 
-    val fileContainUseCase =
-//        "D:\\working\\safety setting\\eng5.2\\New template.xlsx"
-        "C:\\Users\\daotr\\Desktop\\New Microsoft Excel Worksheet.xlsx"
+    val fileContainUseCase = file_ContainUseCase
     val workbookContainUseCase = openExcelFile(fileContainUseCase)!!
     val sheetContainUseCase = workbookContainUseCase.getSheet("UseCase")
 
@@ -82,36 +112,39 @@ fun overViewver2(inputCell: String?): String? {
 
     val extractedText = cutAndFormatString(
         inputCell,
-        "[tempUseCase]",
-        "[/tempUseCase]",
+        "[rowUseCase]",
+        "[/rowUseCase]",
         -1
     )?.let {
         sheetContainUseCase.getRow(it.toInt())
-            .getCell(columnNameToInt("i")).stringCellValue
+            .getCell(columnRef).stringCellValue
             .replace(
-                "[item][/item]",
-                "<"
-                        + (cutAndFormatString(
+                "[idBackItem][/idBackItem]",
+                cutAndFormatString(
                     inputCell,
-                    "[itemJP]",
-                    "[/itemJP]",
+                    "[idBackItem]",
+                    "[/idBackItem]",
                     -1
-                ) ?: "")
-                        + "> ["
-                        + (cutAndFormatString(
+                )?.let { text -> if (text == "null") "" else text } ?: ""
+            )
+            .replace(
+                "[backItem][/backItem]",
+                cutAndFormatString(
                     inputCell,
-                    "[itemEN]",
-                    "[/itemEN]",
+                    "[backItem]",
+                    "[/backItem]",
                     -1
-                ) ?: "")
-                        + "] ("
-                        + (cutAndFormatString(
+                )?.let { text -> if (text == "null") "" else text } ?: ""
+            )
+            .replace(
+                "[idBigItem][/idBigItem]",
+                cutAndFormatString(
                     inputCell,
                     "[idBigItem]",
                     "[/idBigItem]",
                     -1
-                ) ?: "")
-                        + ")"
+                )?.let { text -> if (text == "null") "" else text }
+                    ?: ""
             )
             .replace(
                 "[bigItem][/bigItem]",
@@ -120,8 +153,50 @@ fun overViewver2(inputCell: String?): String? {
                     "[bigItem]",
                     "[/bigItem]",
                     -1
-                ) ?: ""
+                )?.let { text -> if (text == "null") "" else text } ?: ""
             )
+            .replace(
+                "[itemJP][/itemJP]",
+                cutAndFormatString(
+                    inputCell,
+                    "[itemJP]",
+                    "[/itemJP]",
+                    -1
+                )?.let { text -> if (text == "null") "" else text } ?: ""
+            )
+            .replace(
+                "[itemEN][/itemEN]",
+                cutAndFormatString(
+                    inputCell,
+                    "[itemEN]",
+                    "[/itemEN]",
+                    -1
+                )?.let { text -> if (text == "null") "" else text } ?: ""
+            )
+            .replace(
+                "[itemIdScreen][/itemIdScreen]",
+                cutAndFormatString(
+                    inputCell,
+                    "[itemIdScreen]",
+                    "[/itemIdScreen]",
+                    -1
+                )?.let { text -> if (text == "null" || text == "NoChangeScreen" || text == "SmallScreen") "" else text }
+                    ?: ""
+            )
+            //special ///////////
+            .replace(
+                "[bigItemSetting][/bigItemSetting]",
+                (cutAndFormatString(
+                    inputCell,
+                    "[bigItem]",
+                    "[/bigItem]",
+                    -1
+                )?.let { text -> if (text == "null") "" else text } ?: "")
+                    .replace("画面", "")
+                    .replace(" screen", "")
+            )
+            .replace("()", "")
+            .replace("  ", " ")
     }
 
     return extractedText
@@ -131,9 +206,7 @@ fun copyRowver2(workbook: XSSFWorkbook, sheetName: String) {
 
     val sheet = workbook.getSheet(sheetName)
 
-    val fileContainUseCase =
-//        "D:\\working\\safety setting\\eng5.2\\New template.xlsx"
-        "C:\\Users\\daotr\\Desktop\\New Microsoft Excel Worksheet.xlsx"
+    val fileContainUseCase = file_Path
     val workbookContainUseCase = openExcelFile(fileContainUseCase)!!
     val sheetContainUseCase = workbookContainUseCase.getSheet("Sheet4")
 
@@ -176,15 +249,11 @@ fun copyRowver2(workbook: XSSFWorkbook, sheetName: String) {
 fun addRowver2(workbook: XSSFWorkbook, sheetName: String) {
     val sheet = workbook.getSheet(sheetName)
 
-    val fileContainItem =
-//        "D:\\working\\safety setting\\eng5.2\\New template.xlsx"
-        "C:\\Users\\daotr\\Desktop\\New Microsoft Excel Worksheet.xlsx"
+    val fileContainItem = file_ContainItem
     val workbookContainItem = openExcelFile(fileContainItem)!!
     val sheetContainItem = workbookContainItem.getSheet("Item")
 
-    val fileContainUseCase =
-//        "D:\\working\\safety setting\\eng5.2\\New template.xlsx"
-        "C:\\Users\\daotr\\Desktop\\New Microsoft Excel Worksheet.xlsx"
+    val fileContainUseCase = file_ContainUseCase
     val workbookContainUseCase = openExcelFile(fileContainUseCase)!!
     val sheetContainUseCase = workbookContainUseCase.getSheet("UseCase")
 
@@ -225,38 +294,39 @@ fun addRowver2(workbook: XSSFWorkbook, sheetName: String) {
         rowItem: Int,
         extraText: String = ""
     ): String {
-        var cellValueTemplate =
-            "[useCase]" +
-                    sheetContainUseCase.getRow(rowUseCase)
-                        .getCell(columnNameToInt("h")).stringCellValue +
-                    "[/useCase]" +
-                    "[tempUseCase]" +
-                    rowUseCase +
-                    "[/tempUseCase]" +
-                    "[bigItem]" + cutAndFormatString(
-                sheetContainItem.getRow(rowItem).getCell(columnNameToInt("c")).stringCellValue,
-                "[",
-                "]",
-                1
-            ) + "[/bigItem]" +
-                    "[itemJP]" + cutAndFormatString(
-                sheetContainItem.getRow(rowItem).getCell(columnNameToInt("d")).stringCellValue,
-                "[",
-                "]",
-                1
-            ) + "[/itemJP]" +
-                    "[itemEN]" + cutAndFormatString(
-                sheetContainItem.getRow(rowItem).getCell(columnNameToInt("e")).stringCellValue,
-                "[",
-                "]",
-                1
-            ) + "[/itemEN]" +
-                    "[idBigItem]" + cutAndFormatString(
-                sheetContainItem.getRow(rowItem).getCell(columnNameToInt("f")).stringCellValue,
-                "[",
-                "]",
-                1
-            ) + "[/idBigItem]"
+        var cellValueTemplate = "[rowUseCase]" +
+                rowUseCase +
+                "[/rowUseCase]" +
+                "[idBackItem]" + cutAndFormatString(
+            sheetContainItem.getRow(rowItem).getCell(columnNameToInt("b")).stringCellValue
+        ) + "[/idBackItem]" +
+                "[backItem]" + cutAndFormatString(
+            sheetContainItem.getRow(rowItem).getCell(columnNameToInt("c")).stringCellValue
+        ) + "[/backItem]" +
+                "[idBigItem]" + cutAndFormatString(
+            sheetContainItem.getRow(rowItem).getCell(columnNameToInt("d")).stringCellValue
+        ) + "[/idBigItem]" +
+                "[bigItem]" + cutAndFormatString(
+            sheetContainItem.getRow(rowItem).getCell(columnNameToInt("e")).stringCellValue
+        ) + "[/bigItem]" +
+                "[itemJP]" + cutAndFormatString(
+            sheetContainItem.getRow(rowItem).getCell(columnNameToInt("f")).stringCellValue,
+            "[",
+            "]",
+            1
+        ) + "[/itemJP]" +
+                "[itemEN]" + cutAndFormatString(
+            sheetContainItem.getRow(rowItem).getCell(columnNameToInt("g")).stringCellValue,
+            "[",
+            "]",
+            1
+        ) + "[/itemEN]" +
+                "[itemIdScreen]" + cutAndFormatString(
+            sheetContainItem.getRow(rowItem).getCell(columnNameToInt("h")).stringCellValue,
+            "[",
+            "]",
+            1
+        ) + "[/itemIdScreen]"
 
         return cellValueTemplate
     }
@@ -290,18 +360,20 @@ fun addRowver2(workbook: XSSFWorkbook, sheetName: String) {
         val cellValue =
             sheet.getRow(currentRow)?.getCell(columnNameToInt("k"))?.stringCellValue ?: ""
         if (cellValue.contains("screen1")) {
-            val rangesOfItem = getRanges(sheetContainItem, 2, 20, columnNameToInt("c"))
+            val rangesOfItem = getRanges(sheetContainItem, 80, 87, columnNameToInt("d"))
             println(rangesOfItem)
             val rangesOfUseCase = getRanges(sheetContainUseCase, 2, 35, columnNameToInt("g"))
             println(rangesOfUseCase)
             for (rangeOfItem in rangesOfItem) {
-                //display
+                //display item
                 processRows(rangeOfItem, rangesOfUseCase[0],
                     ifAction = { rowItem ->
-                        val cellAction =
-                            sheetContainItem.getRow(rowItem)
-                                .getCell(columnNameToInt("f")).stringCellValue
-                        (cellAction.length > 7 && cellAction[6] != 'A' || cellAction.length < 7)
+                        val cellidBigItem = sheetContainItem.getRow(rowItem)
+                            .getCell(columnNameToInt("h")).stringCellValue
+
+                        (cutAndFormatString(cellidBigItem, takeChars = 7) == "ST_SF_0"
+                                && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() >= 10)
+                                || cellidBigItem == "NoChangeScreen"
                     },
                     extraText = { _, _ ->
                         ""
@@ -309,158 +381,194 @@ fun addRowver2(workbook: XSSFWorkbook, sheetName: String) {
 
                 processRows(rangeOfItem, rangesOfUseCase[0].first + 1..rangesOfUseCase[0].last,
                     ifAction = { rowItem ->
-                        val cellAction =
-                            sheetContainItem.getRow(rowItem)
-                                .getCell(columnNameToInt("f")).stringCellValue
-                        (cellAction.length > 7 && cellAction[6] == 'A' && "${cellAction[7]}${cellAction[8]}".toInt() % 4 == 1)
+                        val cellidBigItem = sheetContainItem.getRow(rowItem)
+                            .getCell(columnNameToInt("h")).stringCellValue
+
+                        (cutAndFormatString(cellidBigItem, takeChars = 7) == "ST_SF_0"
+                                && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() > 1
+                                && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() < 10)
+                                || (cutAndFormatString(cellidBigItem, takeChars = 7) == "ST_SF_A"
+                                && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() % 4 == 1)
                     },
                     extraText = { _, _ ->
                         ""
                     })
 
-                //update
+                //update item
                 processRows(rangeOfItem, rangesOfUseCase[1],
                     ifAction = { rowItem ->
-                        val cellAction =
-                            sheetContainItem.getRow(rowItem)
-                                .getCell(columnNameToInt("f")).stringCellValue
-                        (cellAction.length > 7 && cellAction[6] != 'A' || cellAction.length < 7)
+                        val cellidBigItem = sheetContainItem.getRow(rowItem)
+                            .getCell(columnNameToInt("h")).stringCellValue
+
+                        (cutAndFormatString(cellidBigItem, takeChars = 7) == "ST_SF_0"
+                                && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() >= 10)
+                                || cellidBigItem == "NoChangeScreen"
                     },
                     extraText = { _, _ ->
                         ""
                     })
 
-                processRows(rangeOfItem, rangesOfUseCase[1],
+                processRows(rangeOfItem, rangesOfUseCase[1].first + 1..rangesOfUseCase[1].last,
                     ifAction = { rowItem ->
-                        val cellAction =
-                            sheetContainItem.getRow(rowItem)
-                                .getCell(columnNameToInt("f")).stringCellValue
-                        (cellAction.length > 7 && cellAction[6] == 'A' && "${cellAction[7]}${cellAction[8]}".toInt() % 4 == 1)
+                        val cellidBigItem = sheetContainItem.getRow(rowItem)
+                            .getCell(columnNameToInt("h")).stringCellValue
+
+                        (cutAndFormatString(cellidBigItem, takeChars = 7) == "ST_SF_0"
+                                && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() > 1
+                                && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() < 10)
+                                || (cutAndFormatString(cellidBigItem, takeChars = 7) == "ST_SF_A"
+                                && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() % 4 == 1)
+                    },
+                    extraText = { _, _ ->
+                        ""
+                    })
+
+                // display value item
+                processRows(rangeOfItem, rangesOfUseCase[2],
+                    ifAction = { rowItem ->
+                        val cellidBigItem = sheetContainItem.getRow(rowItem)
+                            .getCell(columnNameToInt("h")).stringCellValue
+
+                        cellidBigItem == "SmallScreen"
+                    },
+                    extraText = { _, _ ->
+                        ""
+                    })
+
+                // update value item
+                processRows(rangeOfItem, rangesOfUseCase[3],
+                    ifAction = { rowItem ->
+                        val cellidBigItem = sheetContainItem.getRow(rowItem)
+                            .getCell(columnNameToInt("h")).stringCellValue
+
+                        cellidBigItem == "SmallScreen"
                     },
                     extraText = { _, _ ->
                         ""
                     })
 
                 // change
-                processRows(rangeOfItem, rangesOfUseCase[2],
-                    ifAction = { rowItem ->
-                        val cellAction = sheetContainItem.getRow(rowItem)
-                            .getCell(columnNameToInt("f")).stringCellValue
-                        (cellAction.length > 7 && cellAction[6] == '0')
-                    },
-                    extraText = { _, _ ->
-                        ""
-                    })
-
-                processRows(rangeOfItem, rangesOfUseCase[3],
-                    ifAction = { rowItem ->
-                        val cellAction = sheetContainItem.getRow(rowItem)
-                            .getCell(columnNameToInt("f")).stringCellValue
-                        (cellAction.isEmpty())
-
-                    },
-                    extraText = { _, _ ->
-                        ""
-                    })
+//                processRows(rangeOfItem, rangesOfUseCase[2],
+//                    ifAction = { rowItem ->
+//                        val cellidBigItem = sheetContainItem.getRow(rowItem)
+//                            .getCell(columnNameToInt("h")).stringCellValue
+//                        (cellidBigItem.length > 7 && cellidBigItem[6] == '0')
+//                    },
+//                    extraText = { _, _ ->
+//                        ""
+//                    })
+//
+//                processRows(rangeOfItem, rangesOfUseCase[3],
+//                    ifAction = { rowItem ->
+//                        val cellidBigItem = sheetContainItem.getRow(rowItem)
+//                            .getCell(columnNameToInt("h")).stringCellValue
+//                        (cellidBigItem.isEmpty())
+//
+//                    },
+//                    extraText = { _, _ ->
+//                        ""
+//                    })
 
                 //reset
                 processRows(rangeOfItem,
-                    rangesOfUseCase[4].elementAt(0)..rangesOfUseCase[4].elementAt(0),
+                    rangesOfUseCase[6].elementAt(0)..rangesOfUseCase[6].elementAt(0),
                     ifAction = { rowItem ->
-                        val cellAction =
+                        val cellidBigItem =
                             sheetContainItem.getRow(rowItem)
-                                .getCell(columnNameToInt("f")).stringCellValue
-                        (cellAction.length > 7 && cellAction[6] == 'A' && "${cellAction[7]}${cellAction[8]}".toInt() % 4 == 1)
+                                .getCell(columnNameToInt("h")).stringCellValue
+
+                        (cutAndFormatString(cellidBigItem, takeChars = 7) == "ST_SF_A"
+                                && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() % 4 == 1)
                     },
                     extraText = { _, _ ->
                         ""
                     })
-                processRows(rangeOfItem,
-                    rangesOfUseCase[4].elementAt(2)..rangesOfUseCase[4].elementAt(2),
-                    ifAction = { rowItem ->
-                        val cellAction =
-                            sheetContainItem.getRow(rowItem)
-                                .getCell(columnNameToInt("f")).stringCellValue
-                        (cellAction.length > 7 && cellAction[6] == 'A' && "${cellAction[7]}${cellAction[8]}".toInt() % 4 == 2)
-                    },
-                    extraText = { _, _ ->
-                        ""
-                    })
-                processRows(rangeOfItem,
-                    rangesOfUseCase[4].elementAt(3)..rangesOfUseCase[4].elementAt(3),
-                    ifAction = { rowItem ->
-                        val cellAction =
-                            sheetContainItem.getRow(rowItem)
-                                .getCell(columnNameToInt("f")).stringCellValue
-                        (cellAction.length > 7 && cellAction[6] == 'A' && "${cellAction[7]}${cellAction[8]}".toInt() % 4 == 1)
-                    },
-                    extraText = { _, _ ->
-                        ""
-                    })
-                processRows(rangeOfItem,
-                    rangesOfUseCase[4].elementAt(1)..rangesOfUseCase[4].elementAt(1),
-                    ifAction = { rowItem ->
-                        val cellAction =
-                            sheetContainItem.getRow(rowItem)
-                                .getCell(columnNameToInt("f")).stringCellValue
-                        (cellAction.length > 7 && cellAction[6] == 'A' && "${cellAction[7]}${cellAction[8]}".toInt() % 4 == 1)
-                    },
-                    extraText = { _, _ ->
-                        ""
-                    })
-                processRows(rangeOfItem,
-                    rangesOfUseCase[4].elementAt(4)..rangesOfUseCase[4].elementAt(4),
-                    ifAction = { rowItem ->
-                        val cellAction =
-                            sheetContainItem.getRow(rowItem)
-                                .getCell(columnNameToInt("f")).stringCellValue
-                        (cellAction.length > 7 && cellAction[6] == 'A' && "${cellAction[7]}${cellAction[8]}".toInt() % 4 == 3)
-                    },
-                    extraText = { _, _ ->
-                        ""
-                    })
-                processRows(rangeOfItem,
-                    rangesOfUseCase[4].elementAt(5)..rangesOfUseCase[4].elementAt(5),
-                    ifAction = { rowItem ->
-                        val cellAction =
-                            sheetContainItem.getRow(rowItem)
-                                .getCell(columnNameToInt("f")).stringCellValue
-                        (cellAction.length > 7 && cellAction[6] == 'A' && "${cellAction[7]}${cellAction[8]}".toInt() % 4 == 0)
-                    },
-                    extraText = { _, _ ->
-                        ""
-                    })
-                processRows(rangeOfItem,
-                    rangesOfUseCase[4].elementAt(6)..rangesOfUseCase[4].elementAt(6),
-                    ifAction = { rowItem ->
-                        val cellAction =
-                            sheetContainItem.getRow(rowItem)
-                                .getCell(columnNameToInt("f")).stringCellValue
-                        (cellAction.length > 7 && cellAction[6] == 'A' && "${cellAction[7]}${cellAction[8]}".toInt() % 4 == 3)
-                    },
-                    extraText = { _, _ ->
-                        ""
-                    })
-                processRows(rangeOfItem,
-                    rangesOfUseCase[4].elementAt(7)..rangesOfUseCase[4].elementAt(7),
-                    ifAction = { rowItem ->
-                        val cellAction =
-                            sheetContainItem.getRow(rowItem)
-                                .getCell(columnNameToInt("f")).stringCellValue
-                        (cellAction.length > 7 && cellAction[6] == 'A' && "${cellAction[7]}${cellAction[8]}".toInt() % 4 == 0)
-                    },
-                    extraText = { _, _ ->
-                        ""
-                    })
+//                processRows(rangeOfItem,
+//                    rangesOfUseCase[4].elementAt(2)..rangesOfUseCase[4].elementAt(2),
+//                    ifAction = { rowItem ->
+//                        val cellidBigItem =
+//                            sheetContainItem.getRow(rowItem)
+//                                .getCell(columnNameToInt("h")).stringCellValue
+//                        (cellidBigItem.length > 7 && cellidBigItem[6] == 'A' && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() % 4 == 2)
+//                    },
+//                    extraText = { _, _ ->
+//                        ""
+//                    })
+//                processRows(rangeOfItem,
+//                    rangesOfUseCase[4].elementAt(3)..rangesOfUseCase[4].elementAt(3),
+//                    ifAction = { rowItem ->
+//                        val cellidBigItem =
+//                            sheetContainItem.getRow(rowItem)
+//                                .getCell(columnNameToInt("h")).stringCellValue
+//                        (cellidBigItem.length > 7 && cellidBigItem[6] == 'A' && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() % 4 == 1)
+//                    },
+//                    extraText = { _, _ ->
+//                        ""
+//                    })
+//                processRows(rangeOfItem,
+//                    rangesOfUseCase[4].elementAt(1)..rangesOfUseCase[4].elementAt(1),
+//                    ifAction = { rowItem ->
+//                        val cellidBigItem =
+//                            sheetContainItem.getRow(rowItem)
+//                                .getCell(columnNameToInt("h")).stringCellValue
+//                        (cellidBigItem.length > 7 && cellidBigItem[6] == 'A' && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() % 4 == 1)
+//                    },
+//                    extraText = { _, _ ->
+//                        ""
+//                    })
+//                processRows(rangeOfItem,
+//                    rangesOfUseCase[4].elementAt(4)..rangesOfUseCase[4].elementAt(4),
+//                    ifAction = { rowItem ->
+//                        val cellidBigItem =
+//                            sheetContainItem.getRow(rowItem)
+//                                .getCell(columnNameToInt("h")).stringCellValue
+//                        (cellidBigItem.length > 7 && cellidBigItem[6] == 'A' && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() % 4 == 3)
+//                    },
+//                    extraText = { _, _ ->
+//                        ""
+//                    })
+//                processRows(rangeOfItem,
+//                    rangesOfUseCase[4].elementAt(5)..rangesOfUseCase[4].elementAt(5),
+//                    ifAction = { rowItem ->
+//                        val cellidBigItem =
+//                            sheetContainItem.getRow(rowItem)
+//                                .getCell(columnNameToInt("h")).stringCellValue
+//                        (cellidBigItem.length > 7 && cellidBigItem[6] == 'A' && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() % 4 == 0)
+//                    },
+//                    extraText = { _, _ ->
+//                        ""
+//                    })
+//                processRows(rangeOfItem,
+//                    rangesOfUseCase[4].elementAt(6)..rangesOfUseCase[4].elementAt(6),
+//                    ifAction = { rowItem ->
+//                        val cellidBigItem =
+//                            sheetContainItem.getRow(rowItem)
+//                                .getCell(columnNameToInt("h")).stringCellValue
+//                        (cellidBigItem.length > 7 && cellidBigItem[6] == 'A' && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() % 4 == 3)
+//                    },
+//                    extraText = { _, _ ->
+//                        ""
+//                    })
+//                processRows(rangeOfItem,
+//                    rangesOfUseCase[4].elementAt(7)..rangesOfUseCase[4].elementAt(7),
+//                    ifAction = { rowItem ->
+//                        val cellidBigItem =
+//                            sheetContainItem.getRow(rowItem)
+//                                .getCell(columnNameToInt("h")).stringCellValue
+//                        (cellidBigItem.length > 7 && cellidBigItem[6] == 'A' && "${cellidBigItem[7]}${cellidBigItem[8]}".toInt() % 4 == 0)
+//                    },
+//                    extraText = { _, _ ->
+//                        ""
+//                    })
 
                 //back
-                processRows(rangeOfItem, rangesOfUseCase[5],
-                    ifAction = { rowItem ->
-                        rowItem == rangeOfItem.last()
-                    },
-                    extraText = { _, _ ->
-                        ""
-                    })
+//                processRows(rangeOfItem, rangesOfUseCase[5],
+//                    ifAction = { rowItem ->
+//                        rowItem == rangeOfItem.last()
+//                    },
+//                    extraText = { _, _ ->
+//                        ""
+//                    })
                 //////////////////////////////
             }
             break
