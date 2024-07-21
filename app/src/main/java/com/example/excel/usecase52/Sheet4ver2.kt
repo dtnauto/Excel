@@ -12,93 +12,121 @@ const val file_Path =
 //    "D:\\working\\safety setting\\eng5.2\\New template.xlsx"
 
 const val file_ContainUseCase =
-    "C:\\Users\\daotr\\Desktop\\HMI_Screen_NHANDT53 - Copy.xlsx"
+    "C:\\Users\\daotr\\Documents\\AndroidStudioProjects\\Excel"
+//    "C:\\Users\\daotr\\Desktop\\HMI_Screen_NHANDT53 - Copy.xlsx"
 ////        "D:\\working\\safety setting\\Input\\Spec\\HMI_Screen_NHANDT53 - Copy.xlsx"
 
 const val file_ContainItem =
-    "C:\\Users\\daotr\\Desktop\\HMI_Screen_NHANDT53 - Copy.xlsx"
+    "C:\\Users\\daotr\\Documents\\AndroidStudioProjects\\Excel"
+//"C:\\Users\\daotr\\Desktop\\HMI_Screen_NHANDT53 - Copy.xlsx"
 //        "D:\\working\\safety setting\\Input\\Spec\\HMI_Screen_NHANDT53 - Copy.xlsx"
+
+const val mark_text = "screen1screen2"
 
 fun main() {
     val filePath = file_Path
 
     val workbook = openExcelFile(filePath)
     if (workbook != null) {
-
-
         // Gọi hàm để chèn các dòng mới
-//        addRowver2(workbook, "Sheet4")
+        addRowver2(workbook, "Sheet4")
         // Gọi hàm để xóa các dòng
 //        deleteRowsContainingSubstring(workbook, "Sheet4", 1, "bigItem")
 
-        // Gọi hàm để chèn các dòng mới
+        // Gọi hàm để copy các usecase các dòng mới
         copyRowver2(workbook, "Sheet1")
 
         // replaceUseCase
-        for (row in 5..workbook.getSheet("Sheet1").lastRowNum) {
-            val currentRow = workbook.getSheet("Sheet1").getRow(row)
-            val inputCell = currentRow?.getCell(columnNameToInt("k"))?.stringCellValue
-            if (inputCell != null) {
-                replaceUseCase(inputCell, columnNameToInt("e"))?.apply {
-                    currentRow.createCell(columnNameToInt("e"))?.setCellValue(this)
-                }
-
-                currentRow.createCell(columnNameToInt("f"))?.cellFormula =
-                    "IF(E${row + 1}<>E${row},1,IF(G${row + 1}<>G${row},F${row}+1,F${row}))"
-
-                replaceUseCase(inputCell, columnNameToInt("g"))?.apply {
-                    currentRow.createCell(columnNameToInt("g"))?.setCellValue(this)
-                }
-
-                replaceUseCase(inputCell, columnNameToInt("h"))?.apply {
-                    currentRow.createCell(columnNameToInt("h"))?.setCellValue(this)
-                }
-
-                replaceUseCase(inputCell, columnNameToInt("i"))?.apply {
-                    currentRow.createCell(columnNameToInt("i"))?.setCellValue(this)
-                }
-
-                currentRow.createCell(columnNameToInt("j"))?.cellFormula =
-                    "IF(F${row + 1}<>F${row},1,J${row}+1)"
-
-                currentRow.createCell(columnNameToInt("l"))?.cellFormula =
-                    "\"UC.\"&D${row + 1}&\"-\"&F${row + 1}&\"-\"&J${row + 1}"
-
-                replaceUseCase(inputCell, columnNameToInt("m"))?.apply {
-                    currentRow.createCell(columnNameToInt("m"))?.setCellValue(this)
-                }
-
-                replaceUseCase(inputCell, columnNameToInt("n"))?.apply {
-                    currentRow.createCell(columnNameToInt("n"))?.setCellValue(this)
-                }
-
-                // chu y fix UseCase de cuoi cung do
-                replaceUseCase(inputCell, columnNameToInt("k"))?.apply {
-                    currentRow.createCell(columnNameToInt("k"))?.setCellValue(this)
-                }
-            }
-        }
-
-        // thay doi mau chu
-        /*applyConditionalFormula(workbook, arrayOf("Sheet1"), arrayOf(columnNameToInt("d"),
-            columnNameToInt("d")
-        ))
-        applyConditionalFormula(workbook, arrayOf("Sheet1"), arrayOf(columnNameToInt("e"),
-            columnNameToInt("e")
-        ))
-        applyConditionalFormula(workbook, arrayOf("Sheet1"), arrayOf(columnNameToInt("g"),
-            columnNameToInt("f")
-        ))
-        applyConditionalFormula(workbook, arrayOf("Sheet1"), arrayOf(columnNameToInt("g"),
-            columnNameToInt("g")
-        ))*/
+        replaceUseCase(workbook, "Sheet1")
 
         // ket thuc file
         saveExcelFile(workbook, filePath)
     }
 }
 
-fun replaceUseCase(inputCell: String?, columnRef: Int): String? {
+fun replaceUseCase(workbook: XSSFWorkbook, sheetName: String){
+    val sheet = workbook.getSheet(sheetName)
+    var lastRow = sheet.lastRowNum
+    var currentRow = 2 // fix current row
+    while (currentRow <= lastRow) {
+        val cellValue =
+            sheet.getRow(currentRow)?.getCell(columnNameToInt("k"))?.stringCellValue ?: ""
+        if (cellValue.contains(mark_text)) {
+            currentRow++
+            for (row in currentRow..sheet.lastRowNum) {
+                val inputCell =
+                    sheet.getRow(row)?.getCell(columnNameToInt("k"))?.stringCellValue
+                if (inputCell != null) {
+//                    replaceText(inputCell, columnNameToInt("e"))?.apply {
+//                        sheet.getRow(row).createCell(columnNameToInt("e"))?.setCellValue(this)
+//                    }
+//
+//                    sheet.getRow(row).createCell(columnNameToInt("f"))?.cellFormula =
+//                        "IF(E${row + 1}<>E${row},1,I" +
+//                                "F(G${row + 1}<>G${row},F${row}+1,F${row}))"
+//
+//                    replaceText(inputCell, columnNameToInt("g"))?.apply {
+//                        sheet.getRow(row).createCell(columnNameToInt("g"))?.setCellValue(this)
+//                    }
+//
+//                    replaceText(inputCell, columnNameToInt("h"))?.apply {
+//                        sheet.getRow(row).createCell(columnNameToInt("h"))?.setCellValue(this)
+//                    }
+//
+//                    replaceText(inputCell, columnNameToInt("i"))?.apply {
+//                        sheet.getRow(row).createCell(columnNameToInt("i"))?.setCellValue(this)
+//                    }
+//
+//                    sheet.getRow(row).createCell(columnNameToInt("j"))?.cellFormula =
+//                        "IF(F${row + 1}<>F${row},1,J${row}+1)"
+//
+//                    sheet.getRow(row).createCell(columnNameToInt("l"))?.cellFormula =
+//                        "\"UC.\"&D${row + 1}&\"-\"&F${row + 1}&\"-\"&J${row + 1}"
+//
+//                    replaceText(inputCell, columnNameToInt("m"))?.apply {
+//                        sheet.getRow(row).createCell(columnNameToInt("m"))?.setCellValue(this)
+//                    }
+//
+//                    replaceText(inputCell, columnNameToInt("n"))?.apply {
+//                        sheet.getRow(row).createCell(columnNameToInt("n"))?.setCellValue(this)
+//                    }
+
+                    // chu y fix UseCase de cuoi cung do
+                    replaceText(inputCell, columnNameToInt("k"))?.apply {
+                        sheet.getRow(row).createCell(columnNameToInt("k"))?.setCellValue(this)
+                    }
+                }
+            }
+
+            // thay doi mau chu
+//            applyConditionalFormula(
+//                workbook, sheetName,
+//                columnNameToInt("d"), columnNameToInt("d"),
+//                currentRow
+//            )
+//            applyConditionalFormula(
+//                workbook, sheetName,
+//                columnNameToInt("e"), columnNameToInt("e"),
+//                currentRow
+//            )
+//            applyConditionalFormula(
+//                workbook, sheetName,
+//                columnNameToInt("g"), columnNameToInt("f"),
+//                currentRow
+//            )
+//            applyConditionalFormula(
+//                workbook, sheetName,
+//                columnNameToInt("g"), columnNameToInt("g"),
+//                currentRow
+//            )
+
+            break
+        }
+        currentRow++
+    }
+}
+
+fun replaceText(inputCell: String?, columnRef: Int): String? {
 
     val fileContainUseCase = file_ContainUseCase
     val workbookContainUseCase = openExcelFile(fileContainUseCase)!!
@@ -115,9 +143,8 @@ fun replaceUseCase(inputCell: String?, columnRef: Int): String? {
         "[rowUseCase]",
         "[/rowUseCase]",
         -1
-    )?.let {
-        sheetContainUseCase.getRow(it.toInt())
-            .getCell(columnRef).stringCellValue
+    )?.toInt()?.let {
+        sheetContainUseCase.getRow(it).getCell(columnRef).stringCellValue
             .replace(
                 "[idBackItem][/idBackItem]",
                 cutAndFormatString(
@@ -185,6 +212,26 @@ fun replaceUseCase(inputCell: String?, columnRef: Int): String? {
             )
             //special ///////////
             .replace(
+                "[itemJPButton][/itemJPButton]",
+                (cutAndFormatString(cutAndFormatString(
+                    inputCell,
+                    "[itemJP]",
+                    "[/itemJP]",
+                    -1
+                )?.let { text -> if (text == "null") "" else text } ?: "",
+                    endKeyword = "リセット") ?: "").let { text -> if (text == "") "" else text + "リセット" }
+            )
+            .replace(
+                "[itemENButton][/itemENButton]",
+                (cutAndFormatString(cutAndFormatString(
+                    inputCell,
+                    "[itemEN]",
+                    "[/itemEN]",
+                    -1
+                )?.let { text -> if (text == "null") "" else text } ?: "",
+                    endKeyword = "reset") ?: "").let { text -> if (text == "") "" else text + "reset" }
+            )
+            .replace(
                 "[bigItemSetting][/bigItemSetting]",
                 (cutAndFormatString(
                     inputCell,
@@ -217,7 +264,7 @@ fun copyRowver2(workbook: XSSFWorkbook, sheetName: String) {
             sheetContainUseCase.getRow(currentRowUseCase)
                 ?.getCell(columnNameToInt("k"))?.stringCellValue
                 ?: ""
-        if (cellValue.contains("screen1")) {
+        if (cellValue.contains(mark_text)) {
             break
         }
         currentRowUseCase++
@@ -228,7 +275,7 @@ fun copyRowver2(workbook: XSSFWorkbook, sheetName: String) {
     while (currentRow <= lastRow) {
         val cellValue =
             sheet.getRow(currentRow)?.getCell(columnNameToInt("k"))?.stringCellValue ?: ""
-        if (cellValue.contains("screen1")) {
+        if (cellValue.contains(mark_text)) {
             while (currentRowUseCase <= lastRowUseCase) {
                 currentRow++
                 currentRowUseCase++
@@ -359,8 +406,8 @@ fun addRowver2(workbook: XSSFWorkbook, sheetName: String) {
     while (currentRow <= lastRow) {
         val cellValue =
             sheet.getRow(currentRow)?.getCell(columnNameToInt("k"))?.stringCellValue ?: ""
-        if (cellValue.contains("screen1")) {
-            val rangesOfItem = getRanges(sheetContainItem, 80, 87, columnNameToInt("d"))
+        if (cellValue.contains(mark_text)) {
+            val rangesOfItem = getRanges(sheetContainItem, 53, 78, columnNameToInt("d"))
             println(rangesOfItem)
             val rangesOfUseCase = getRanges(sheetContainUseCase, 2, 35, columnNameToInt("g"))
             println(rangesOfUseCase)
@@ -562,14 +609,18 @@ fun addRowver2(workbook: XSSFWorkbook, sheetName: String) {
 //                    })
 
                 //back
-//                processRows(rangeOfItem, rangesOfUseCase[5],
-//                    ifAction = { rowItem ->
-//                        rowItem == rangeOfItem.last()
-//                    },
-//                    extraText = { _, _ ->
-//                        ""
-//                    })
-                //////////////////////////////
+                processRows(rangeOfItem, rangesOfUseCase[8],
+                    ifAction = { rowItem ->
+
+                        val cellidBigItem = sheetContainItem.getRow(rowItem)
+                            .getCell(columnNameToInt("h")).stringCellValue
+
+                        rowItem == rangeOfItem.last() && (cutAndFormatString(cellidBigItem, takeChars = 8) != "ST_SF_09")
+                    },
+                    extraText = { _, _ ->
+                        ""
+                    })
+                ////////////////////////////
             }
             break
         }
