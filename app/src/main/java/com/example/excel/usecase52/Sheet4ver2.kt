@@ -12,13 +12,11 @@ const val file_Path =
 //    "D:\\working\\safety setting\\eng5.2\\New template.xlsx"
 
 const val file_ContainUseCase =
-    "C:\\Users\\daotr\\Documents\\AndroidStudioProjects\\Excel"
-//    "C:\\Users\\daotr\\Desktop\\HMI_Screen_NHANDT53 - Copy.xlsx"
+    "C:\\Users\\daotr\\Desktop\\HMI_Screen_NHANDT53 - Copy.xlsx"
 ////        "D:\\working\\safety setting\\Input\\Spec\\HMI_Screen_NHANDT53 - Copy.xlsx"
 
 const val file_ContainItem =
-    "C:\\Users\\daotr\\Documents\\AndroidStudioProjects\\Excel"
-//"C:\\Users\\daotr\\Desktop\\HMI_Screen_NHANDT53 - Copy.xlsx"
+    "C:\\Users\\daotr\\Desktop\\HMI_Screen_NHANDT53 - Copy.xlsx"
 //        "D:\\working\\safety setting\\Input\\Spec\\HMI_Screen_NHANDT53 - Copy.xlsx"
 
 const val mark_text = "screen1screen2"
@@ -34,10 +32,10 @@ fun main() {
 //        deleteRowsContainingSubstring(workbook, "Sheet4", 1, "bigItem")
 
         // Gọi hàm để copy các usecase các dòng mới
-        copyRowver2(workbook, "Sheet1")
+//        copyRowver2(workbook, "Sheet1")
 
         // replaceUseCase
-        replaceUseCase(workbook, "Sheet1")
+//        replaceUseCase(workbook, "Sheet1")
 
         // ket thuc file
         saveExcelFile(workbook, filePath)
@@ -304,31 +302,63 @@ fun addRowver2(workbook: XSSFWorkbook, sheetName: String) {
     val workbookContainUseCase = openExcelFile(fileContainUseCase)!!
     val sheetContainUseCase = workbookContainUseCase.getSheet("UseCase")
 
+//    fun getRanges(
+//        // get range từng khoảng giống nhau
+//        sheetGetRanges: XSSFSheet,
+//        startRow: Int,
+//        endRow: Int,
+//        columnGetRanges: Int,
+//    ): MutableList<IntRange> {
+//        val ranges = mutableListOf<IntRange>()
+//
+//        var start = startRow
+//        var currentCellValue: String? = null
+//
+//        for (row in startRow..endRow) {
+//            val cellValue =
+//                sheetGetRanges.getRow(row).getCell(columnGetRanges).stringCellValue
+//            if (currentCellValue == null) {
+//                currentCellValue = cellValue
+//                start = row
+//            } else if (cellValue != currentCellValue) {
+//                ranges.add(start until row)
+//                currentCellValue = cellValue
+//                start = row
+//            }
+//        }
+//        ranges.add(start..endRow)  // Add the last range
+//
+//        return ranges
+//    }
+
     fun getRanges(
         // get range từng khoảng giống nhau
         sheetGetRanges: XSSFSheet,
         startRow: Int,
         endRow: Int,
         columnGetRanges: Int,
-    ): MutableList<IntRange> {
-        val ranges = mutableListOf<IntRange>()
+    ): MutableList<MutableList<Int>> {
+        val ranges = mutableListOf<MutableList<Int>>()
 
         var start = startRow
         var currentCellValue: String? = null
+        var currentRange = mutableListOf<Int>()
 
         for (row in startRow..endRow) {
-            val cellValue =
-                sheetGetRanges.getRow(row).getCell(columnGetRanges).stringCellValue
+            val cellValue = sheetGetRanges.getRow(row).getCell(columnGetRanges).stringCellValue
             if (currentCellValue == null) {
                 currentCellValue = cellValue
                 start = row
+                currentRange.add(row)
             } else if (cellValue != currentCellValue) {
-                ranges.add(start until row)
+                ranges.add(currentRange)
                 currentCellValue = cellValue
-                start = row
+                currentRange = mutableListOf(row)
+            } else {
+                currentRange.add(row)
             }
         }
-        ranges.add(start..endRow)  // Add the last range
+        ranges.add(currentRange)  // Add the last range
 
         return ranges
     }
@@ -384,8 +414,8 @@ fun addRowver2(workbook: XSSFWorkbook, sheetName: String) {
     }
 
     fun processRows(
-        rowItemRange: IntRange,
-        rowUseCaseRange: IntRange,
+        rowItemRange: List<Int>,
+        rowUseCaseRange: List<Int>,
         ifAction: (Int) -> Boolean = { _ -> false },
         extraText: (Int, Int) -> String = { _, _ -> "" }
     ) {
@@ -407,7 +437,7 @@ fun addRowver2(workbook: XSSFWorkbook, sheetName: String) {
         val cellValue =
             sheet.getRow(currentRow)?.getCell(columnNameToInt("k"))?.stringCellValue ?: ""
         if (cellValue.contains(mark_text)) {
-            val rangesOfItem = getRanges(sheetContainItem, 53, 78, columnNameToInt("d"))
+            val rangesOfItem = getRanges(sheetContainItem, 80, 89, columnNameToInt("d"))
             println(rangesOfItem)
             val rangesOfUseCase = getRanges(sheetContainUseCase, 2, 35, columnNameToInt("g"))
             println(rangesOfUseCase)
@@ -426,7 +456,7 @@ fun addRowver2(workbook: XSSFWorkbook, sheetName: String) {
                         ""
                     })
 
-                processRows(rangeOfItem, rangesOfUseCase[0].first + 1..rangesOfUseCase[0].last,
+                processRows(rangeOfItem, rangesOfUseCase[0].drop(1),
                     ifAction = { rowItem ->
                         val cellidBigItem = sheetContainItem.getRow(rowItem)
                             .getCell(columnNameToInt("h")).stringCellValue
@@ -455,7 +485,7 @@ fun addRowver2(workbook: XSSFWorkbook, sheetName: String) {
                         ""
                     })
 
-                processRows(rangeOfItem, rangesOfUseCase[1].first + 1..rangesOfUseCase[1].last,
+                processRows(rangeOfItem, rangesOfUseCase[1].drop(1),
                     ifAction = { rowItem ->
                         val cellidBigItem = sheetContainItem.getRow(rowItem)
                             .getCell(columnNameToInt("h")).stringCellValue
@@ -517,8 +547,7 @@ fun addRowver2(workbook: XSSFWorkbook, sheetName: String) {
 //                    })
 
                 //reset
-                processRows(rangeOfItem,
-                    rangesOfUseCase[6].elementAt(0)..rangesOfUseCase[6].elementAt(0),
+                processRows(rangeOfItem, listOf(rangesOfUseCase[6][0]),
                     ifAction = { rowItem ->
                         val cellidBigItem =
                             sheetContainItem.getRow(rowItem)
@@ -609,13 +638,14 @@ fun addRowver2(workbook: XSSFWorkbook, sheetName: String) {
 //                    })
 
                 //back
-                processRows(rangeOfItem, rangesOfUseCase[8],
+                processRows(
+                    listOf(rangeOfItem[0]), rangesOfUseCase[8],
                     ifAction = { rowItem ->
 
                         val cellidBigItem = sheetContainItem.getRow(rowItem)
-                            .getCell(columnNameToInt("h")).stringCellValue
+                            .getCell(columnNameToInt("d")).stringCellValue
 
-                        rowItem == rangeOfItem.last() && (cutAndFormatString(cellidBigItem, takeChars = 8) != "ST_SF_09")
+                        cellidBigItem != "ST_SF_001"
                     },
                     extraText = { _, _ ->
                         ""

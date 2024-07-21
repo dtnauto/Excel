@@ -107,3 +107,28 @@ fun cutAndFormatString(
     // Trả về kết quả
     return formattedString
 }
+
+fun parseRanges(input: String): List<Int> {
+    if (input.isEmpty()) return emptyList()
+
+    val result = mutableListOf<Int>()
+    val parts = input.split(';').filter { it.isNotEmpty() }
+
+    for (part in parts) {
+        try {
+            if (".." in part) {
+                val rangeParts = part.split("..")
+                val start = rangeParts[0].toInt()
+                val end = rangeParts[1].toInt()
+                result.addAll((start..end).toList())
+            } else {
+                result.add(part.toInt())
+            }
+        } catch (e: NumberFormatException) {
+            // Nếu không thể chuyển đổi thành số nguyên, trả về danh sách rỗng
+            return emptyList()
+        }
+    }
+
+    return result
+}
