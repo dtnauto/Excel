@@ -10,62 +10,70 @@ import java.io.File
 import java.io.InputStreamReader
 import java.nio.charset.Charset
 
-
-fun findKeywordsInLog(logFilePath: String, keywords: List<String>, addLine: Boolean = false): MutableList<String?> {
-    // Khởi tạo một danh sách matchingLines có kích thước bằng danh sách keywords, với các phần tử ban đầu là null
-    val matchingLines = MutableList<String?>(keywords.size) { null }
+// Hàm đọc file log và tìm từ khóa theo thứ tự
+fun findKeywordsInLog(logFilePath: String, keywords: List<String>, addLine: Boolean = false): MutableList<String?>? {
 
     // Đọc file log từ đường dẫn (bỏ ký tự thừa "- ")
     val logFile = File(file_Path + logFilePath.removePrefix("- ").trim())
-
     // Kiểm tra nếu file tồn tại và có đuôi .txt
     if (!logFile.exists()) {
-        return matchingLines
+        println("File not exists: " + logFile)
+        return null
+    }
+    if ((!(logFilePath.endsWith(".txt", ignoreCase = true)))) {
+//        println("Format file: " + logFilePath)
+        return null
     }
 
-    if (!(logFilePath.endsWith(".txt", ignoreCase = true))) {
-        return matchingLines
+    // Khởi tạo một danh sách matchingLines có kích thước bằng danh sách keywords, với các phần tử ban đầu là null
+    val matchingLines = MutableList<String?>(keywords.size) { null }
+
+    // Khởi tạo một mảng để đếm số lần xuất hiện của mỗi từ khóa
+    val keywordCount = IntArray(keywords.size) { 0 }
+    for ((index, keyword) in keywords.withIndex()){
+        // Kiểm tra nếu từ khóa hiện tại có định dạng đúng với hasIndexFormat
+        if (hasIndexFormat(keyword)) {
+            keywordCount[index] = -1
+            matchingLines[index] = keywords[index]
+        }
+        else
+            matchingLines[index] = "null"
     }
 
     // Mở file với định dạng UTF-16LE
     logFile.inputStream().use { inputStream ->
         InputStreamReader(inputStream, Charset.forName("UTF-16LE")).use { reader ->
-            var indexKeyword = 0 // Chỉ số từ khóa hiện tại
-            var lineNumber = 1 // Số dòng hiện tại, bắt đầu từ 1
+
+            // Số dòng hiện tại, bắt đầu từ 1
+            var lineNumber = 0
 
             // Đọc từng dòng trong file
             reader.forEachLine { line ->
-                // Nếu đã duyệt hết tất cả từ khóa thì dừng lại
-                if (indexKeyword >= keywords.size) return@forEachLine
-
-                // Kiểm tra nếu từ khóa hiện tại có định dạng đúng với hasIndexFormat
-                if (hasIndexFormat(keywords[indexKeyword])) {
-                    matchingLines[indexKeyword] = keywords[indexKeyword]
-                    // Nếu từ khóa có định dạng (??), bỏ qua và chuyển sang từ khóa tiếp theo
-                    indexKeyword++
-                    return@forEachLine
-                }
-
-                // Kiểm tra nếu dòng chứa từ khóa hiện tại
-                if (line.contains(keywords[indexKeyword])) {
-                    // Nếu addLine = true, thêm chỉ số dòng, nếu không thì trả về chuỗi trống ""
-                    val linePrefix = if (addLine) "Line $lineNumber: " else ""
-
-                    // Bỏ qua số ký tự cố định ở đầu (ví dụ bỏ qua 34 ký tự đầu tiên)
-                    val extractedLine = if (line.length > 34) line.substring(33) else "Line 0"
-
-                    // Thêm dòng vào vị trí tương ứng với từ khóa trong danh sách keywords
-                    matchingLines[indexKeyword] = linePrefix + extractedLine
-
-                    // Tăng chỉ số để chuyển sang từ khóa tiếp theo
-                    indexKeyword++
-                }
-
                 // Tăng số dòng sau mỗi lần đọc
                 lineNumber++
+
+                for ((index, keyword) in keywords.withIndex()) {
+                    if (keywordCount[index] == 0) {
+                        // Kiểm tra nếu dòng chứa từ khóa hiện tại
+                        if (line.contains(keyword)) {
+                            // Tăng so lan neu lon hơn 1 thì khong can kiem tra nua
+                            keywordCount[index]++
+                            // Nếu addLine = true, thêm chỉ số dòng, nếu không thì trả về chuỗi trống ""
+                            val linePrefix = if (addLine) "Line $lineNumber: " else ""
+
+                            // Bỏ qua số ký tự cố định ở đầu (ví dụ bỏ qua 34 ký tự đầu tiên)
+                            val extractedLine = if (line.length > 34) line.substring(33) else "Line 0"
+
+                            // Thêm dòng vào vị trí tương ứng với từ khóa trong danh sách keywords
+                            matchingLines[index] = linePrefix + extractedLine
+                        }
+                    }
+                }
             }
         }
     }
+
+    println(keywordCount.contentToString())
 
     return matchingLines
 }
@@ -121,7 +129,7 @@ fun processExcelFile(workbook: XSSFWorkbook, sheetName: String, startRow: Int, e
         val keywordsBlock = cellM?.stringCellValue ?: "" //Tách từ khóa từ ô M
 
         val keywords = extractKeywords(keywordsBlock) //Tìm từ khóa trong file log
-        val logMatches = findKeywordsInLog(logFilePath, keywords, true) //Format kết quả để điền vào ô N
+        val logMatches = findKeywordsInLog(logFilePath, keywords, true) ?: continue //Format kết quả để điền vào ô N
         val result = formatLogMatches(logMatches) //Điền kết quả vào ô N
         cellN.setCellValue(result)
 
@@ -135,11 +143,11 @@ fun processExcelFile(workbook: XSSFWorkbook, sheetName: String, startRow: Int, e
 }
 
 const val file_Path =
-//    "D:\\svn\\GAM.IVI.MCDC_IVI\\trunk\\01.Document\\01.EngineeringDocument\\Vehicle\\00.Output\\71_SWE4_ENG7.2\\07_安全装備設定\\Feature_2\\"
+//    "D:\\svn\\GAM.IVI.MCDC_IVI\\trunk\\01.Document\\01.EngineeringDocument\\Vehicle\\00.Output\\71_SWE4_ENG7.2\\07_安全装備設定\\Feature_6\\"
     "C:\\Users\\daotr\\Desktop\\New folder//"
 const val file_Name =
     "VehicleApp-MCDC-SWE4-TSR_結合テスト_安全装備設定_F1_usecase_ST_SF_014-NhanDT53 - Copy.xlsx"
-//    "VehicleApp-MCDC-SWE4-TSR_結合テスト_安全装備設定_F2_Usecase - Round2 - NhanDT53 - Copy.xlsm"
+//    "VehicleApp-MCDC-SWE4-TSR_結合テスト_安全装備設定_F6_Usecase - NhanDT53 - Copy.xlsm"
 
 fun main() {
     val filePath = file_Path + file_Name
